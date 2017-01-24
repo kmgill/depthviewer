@@ -18,6 +18,7 @@ var MainView = function() {
     var lightShadowMapViewer;
 
     var useColorAltimetry = false;
+    var colorSpecName = "rainbow";
     var diffuseTexture = null;
 
     var stats = new Stats();
@@ -50,7 +51,7 @@ var MainView = function() {
     light = new THREE.SpotLight( 0xffffff, 1.5, 0, Math.PI / 2 );
     light.position.set( 0,1500, 1000);
     light.target.position.set( 0, 0, 0 );
-    light.castShadow = true;
+    light.castShadow = false; // Turned off for now until I can get it working
     light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera(50, 1, 1200, 2500 ) );
     light.shadow.bias = 0.0001;
     light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
@@ -137,7 +138,7 @@ var MainView = function() {
                 control.setSize( Math.max( control.size - 0.1, 0.1 ) );
                 break;
             case 84:	/*t*/
-                showHUD = ! showHUD;
+                //showHUD = ! showHUD;
                 break;
             case 80: // P
                 saveScreenshot();
@@ -194,6 +195,13 @@ var MainView = function() {
         animate();
     };
 
+    var setColorSpecName = function(n) {
+        colorSpecName = n;
+        if (useColorAltimetry) {
+            applyColorAltimetryMap();
+        }
+    };
+
     var applyColorAltimetryMap = function() {
         var texture = material.bumpMap;
 
@@ -203,7 +211,7 @@ var MainView = function() {
         scratchMap.height = texture.image.height;
         scratchMap.getContext( '2d' ).drawImage( texture.image, 0, 0 );
 
-        heightToColorAltimetry(scratchMap, displacementDirection == -1);
+        heightToColorAltimetry(scratchMap, displacementDirection == -1, colorSpecName);
 
         var colortMapTex = new THREE.Texture( scratchMap );
         colortMapTex.needsUpdate = true;
@@ -297,6 +305,7 @@ var MainView = function() {
         setRenderAnaglyph : setRenderAnaglyph,
         saveScreenshot : saveScreenshot,
         setDisplacementScale : setDisplacementScale,
-        setUsingColorAltimetry : setUsingColorAltimetry
+        setUsingColorAltimetry : setUsingColorAltimetry,
+        setColorSpecName : setColorSpecName
     };
 };

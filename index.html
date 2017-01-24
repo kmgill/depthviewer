@@ -47,7 +47,14 @@
             <div class="controls-input-container">
                 <input type="checkbox" id="colorized-depth"/>
                 <label for="colorized-depth">Colorized Depth</label>
+                <select name="color-spec" id="color-spec" class="controls-color-spec-select">
+                    <option value="rainbow">Rainbow</option>
+                    <option value="monochrome">Monochrome</option>
+                    <option value="divergent">Divergent</option>
+                </select>
             </div>
+
+
 
             <div class="controls-input-container">
                 <div class="controls-box-label">Light Intensity:</div>
@@ -92,92 +99,104 @@
     <script>
 
 
-    var mainView = new MainView();
-
-    mainView.setTextureMap("test-images/testtex.jpg");
-    mainView.setDepthMap("test-images/testdepth.jpg");
-    mainView.start();
-
-    var texUploader = new Uploader("tex-map-preview", "tex-map-fileselect", mainView.setTextureMap);
-    var depthUploader = new Uploader("depth-map-preview", "depth-map-fileselect", mainView.setDepthMap);
+    $( function() {
 
 
-    $( "#invert-displacement" ).change(function() {
-        mainView.setInvertDisplacement($(this).prop('checked'));
+        var mainView = new MainView();
+
+        mainView.setTextureMap("test-images/testtex.jpg");
+        mainView.setDepthMap("test-images/testdepth.jpg");
+        mainView.start();
+
+        var texUploader = new Uploader("tex-map-preview", "tex-map-fileselect", mainView.setTextureMap);
+        var depthUploader = new Uploader("depth-map-preview", "depth-map-fileselect", mainView.setDepthMap);
+
+
+        $( "#invert-displacement" ).change(function() {
+            mainView.setInvertDisplacement($(this).prop('checked'));
+        });
+
+        $( "#render-anaglyph" ).change(function() {
+            mainView.setRenderAnaglyph($(this).prop('checked'));
+        });
+
+        $( "#colorized-depth" ).change(function() {
+            mainView.setUsingColorAltimetry($(this).prop('checked'));
+        });
+
+        $( function() {
+            $( "input[type='checkbox']" ).checkboxradio();
+        } );
+
+        function refreshLightIntensity() {
+            var intensity = $( "#light-intensity-slider" ).slider( "value" );
+            mainView.setLightIntensity(intensity / 100.0);
+        }
+
+        $( function() {
+            $( "#light-intensity-slider" ).slider({
+                range: "min",
+                max: 200,
+                value: 150,
+                slide: refreshLightIntensity,
+                change: refreshLightIntensity
+            });
+        } );
+
+        function refreshModelRoughness() {
+            var intensity = $( "#model-roughness-slider" ).slider( "value" );
+            mainView.setMaterialRoughness(intensity / 100.0);
+        }
+
+        $( function() {
+            $( "#model-roughness-slider" ).slider({
+                range: "min",
+                max: 100,
+                value: 90,
+                slide: refreshModelRoughness,
+                change: refreshModelRoughness
+            });
+        } );
+
+
+        function refreshModelMetalness() {
+            var intensity = $( "#model-metalness-slider" ).slider( "value" );
+            mainView.setMaterialMetalness(intensity / 100.0);
+        }
+
+        $( function() {
+            $( "#model-metalness-slider" ).slider({
+                range: "min",
+                max: 100,
+                value: 20,
+                slide: refreshModelMetalness,
+                change: refreshModelMetalness
+            });
+        } );
+
+        function refreshModelDisplacement() {
+            var intensity = $( "#model-displacement-slider" ).slider( "value" );
+            mainView.setDisplacementScale(intensity);
+        }
+
+        $( function() {
+            $( "#model-displacement-slider" ).slider({
+                range: "min",
+                max: 300,
+                value: 100,
+                slide: refreshModelDisplacement,
+                change: refreshModelDisplacement
+            });
+        } );
+
+        $( "#color-spec" ).selectmenu({
+            change: function( event, data ) {
+                mainView.setColorSpecName(data.item.value);
+            },
+            width: 130
+        });
+
     });
-
-    $( "#render-anaglyph" ).change(function() {
-        mainView.setRenderAnaglyph($(this).prop('checked'));
-    });
-
-    $( "#colorized-depth" ).change(function() {
-        mainView.setUsingColorAltimetry($(this).prop('checked'));
-    });
-
-    $( function() {
-        $( "input[type='checkbox']" ).checkboxradio();
-    } );
-
-    function refreshLightIntensity() {
-        var intensity = $( "#light-intensity-slider" ).slider( "value" );
-        mainView.setLightIntensity(intensity / 100.0);
-    }
-
-    $( function() {
-        $( "#light-intensity-slider" ).slider({
-            range: "min",
-            max: 200,
-            value: 150,
-            slide: refreshLightIntensity,
-            change: refreshLightIntensity
-        });
-    } );
-
-    function refreshModelRoughness() {
-        var intensity = $( "#model-roughness-slider" ).slider( "value" );
-        mainView.setMaterialRoughness(intensity / 100.0);
-    }
-
-    $( function() {
-        $( "#model-roughness-slider" ).slider({
-            range: "min",
-            max: 100,
-            value: 90,
-            slide: refreshModelRoughness,
-            change: refreshModelRoughness
-        });
-    } );
-
-
-    function refreshModelMetalness() {
-        var intensity = $( "#model-metalness-slider" ).slider( "value" );
-        mainView.setMaterialMetalness(intensity / 100.0);
-    }
-
-    $( function() {
-        $( "#model-metalness-slider" ).slider({
-            range: "min",
-            max: 100,
-            value: 20,
-            slide: refreshModelMetalness,
-            change: refreshModelMetalness
-        });
-    } );
-
-    function refreshModelDisplacement() {
-        var intensity = $( "#model-displacement-slider" ).slider( "value" );
-        mainView.setDisplacementScale(intensity);
-    }
-
-    $( function() {
-        $( "#model-displacement-slider" ).slider({
-            range: "min",
-            max: 300,
-            value: 100,
-            slide: refreshModelDisplacement,
-            change: refreshModelDisplacement
-        });
-    } );
     </script>
 
     <script>

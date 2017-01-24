@@ -1,10 +1,13 @@
 
-var BlackWhiteColorSpec = [
+var ColorSpecs = {};
+
+ColorSpecs["monochrome"] = [
     {f:0, r:0, g:0, b:0},
     {f:1, r:255, g:255, b:255}
 ];
 
-var ColorAltimetrySpec = [
+
+ColorSpecs["rainbow"] = [
     {f:0, r:110, g:0, b:187},
     {f:0.15, r:0, g:0, b:255},
     {f:0.33, r:0, g:255, b:255},
@@ -15,10 +18,18 @@ var ColorAltimetrySpec = [
     {f:1, r:255, g:255, b:255}
 ];
 
-function getLowerColorStopForFraction(f) {
-    var lastStop = ColorAltimetrySpec[0];
-    for (var i = 0; i < ColorAltimetrySpec.length; i++) {
-        var stop = ColorAltimetrySpec[i];
+ColorSpecs["divergent"] = [
+    {f: 0, r: 2, g: 3, b: 206},
+    {f: 0.25, r: 143, g: 226, b: 255},
+    {f: 0.5, r: 255, g: 255, b: 255},
+    {f: 0.75, r: 255, g: 241, b: 27},
+    {f: 1.0, r: 253, g: 0, b: 0}
+];
+
+function getLowerColorStopForFraction(f, colorSpec) {
+    var lastStop = colorSpec[0];
+    for (var i = 0; i < colorSpec.length; i++) {
+        var stop = colorSpec[i];
         if (stop.f >= f) {
             return lastStop;
         }
@@ -27,9 +38,9 @@ function getLowerColorStopForFraction(f) {
     return lastStop; // Might not need this, or in another form
 }
 
-function getUpperColorStopForFraction(f) {
-    for (var i = 0; i < ColorAltimetrySpec.length; i++) {
-        var stop = ColorAltimetrySpec[i];
+function getUpperColorStopForFraction(f, colorSpec) {
+    for (var i = 0; i < colorSpec.length; i++) {
+        var stop = colorSpec[i];
         if (stop.f >= f) {
             return stop;
         }
@@ -38,18 +49,18 @@ function getUpperColorStopForFraction(f) {
 }
 
 
-function getColorStopForFraction(f) {
-    var lower = getLowerColorStopForFraction(f);
-    var upper = getUpperColorStopForFraction(f);
+function getColorStopForFraction(f, colorSpec) {
+    var lower = getLowerColorStopForFraction(f, colorSpec);
+    var upper = getUpperColorStopForFraction(f, colorSpec);
     return {
         "lower": lower,
         "upper": upper
     };
 }
 
-function getColorForFraction(f) {
+function getColorForFraction(f, colorSpec) {
 
-    var lowerUpper = getColorStopForFraction(f);
+    var lowerUpper = getColorStopForFraction(f, colorSpec);
     var lower = lowerUpper.lower;
     var upper = lowerUpper.upper;
 
@@ -66,7 +77,10 @@ function getColorForFraction(f) {
     };
 }
 
-function heightToColorAltimetry(canvas, invert) {
+function heightToColorAltimetry(canvas, invert, colorSpecName) {
+
+    var colorSpec = ColorSpecs[colorSpecName];
+
     var minMax = getMinMaxValuesMonochrome(canvas);
 
     var min = minMax.min;
@@ -88,7 +102,7 @@ function heightToColorAltimetry(canvas, invert) {
         if (invert) {
             f = 1.0 - f;
         }
-        var color = getColorForFraction(f, invert);
+        var color = getColorForFraction(f, colorSpec);
 
         dst.data[ i ] = color.r;
         dst.data[ i + 1 ] = color.g;
