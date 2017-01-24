@@ -1,0 +1,156 @@
+<html>
+    <head>
+
+        <link rel="stylesheet" href="lib/jquery-ui/jquery-ui.css">
+        <link rel="stylesheet" href="styles.css">
+
+        <link rel="stylesheet" href="lib/css/font-awesome.min.css">
+        <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+        <script src="lib/jquery-ui/jquery-ui.js"></script>
+
+    </head>
+    <body>
+
+
+    <div class="controls-overlay-box">
+        <div class="tex-image-box">
+            <div class="tex-box-header">Color Map</div>
+            <div class="tex-image-preview-container" id="tex-map-preview">
+                <img src="test-images/testtex.jpg" class="tex-image-preview" />
+            </div>
+            <input type="file" id="tex-map-fileselect" name="fileselect[]" class="tex-upload-input"/>
+            <label for="tex-map-fileselect" class="tex-upload-label"><i class="fa fa-upload" aria-hidden="true"></i> Choose a file</label>
+        </div>
+        <div class="tex-image-box">
+            <div class="tex-box-header">Depth Map</div>
+            <div class="tex-image-preview-container" id="depth-map-preview">
+                <img src="test-images/testdepth.jpg" class="tex-image-preview" />
+            </div>
+            <input type="file" id="depth-map-fileselect" name="fileselect[]" class="tex-upload-input"/>
+            <label for="depth-map-fileselect" class="tex-upload-label"><i class="fa fa-upload" aria-hidden="true"></i> Choose a file</label>
+        </div>
+
+        <div class="controls-box">
+            <div class="controls-box-title">Options:</div>
+
+            <div class="controls-input-container">
+                <input type="checkbox" id="render-anaglyph"/>
+                <label for="render-anaglyph">3D Anaglyph</label>
+            </div>
+
+            <div class="controls-input-container">
+                <input type="checkbox" id="invert-displacement" checked="checked"/>
+                <label for="invert-displacement">Invert Displacement</label>
+            </div>
+
+            <div class="controls-input-container">
+                <div class="controls-box-label">Light Intensity:</div>
+                <div id="light-intensity-slider"></div>
+            </div>
+
+            <div class="controls-input-container">
+                <div class="controls-box-label">Model Roughness:</div>
+                <div id="model-roughness-slider"></div>
+            </div>
+
+            <div class="controls-input-container">
+                <div class="controls-box-label">Model Metalness:</div>
+                <div id="model-metalness-slider"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="instructions-box">
+        "W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size | "P" screenshot
+    </div>
+
+    <canvas id="normalCanvas" style="position: absolute; display:none"></canvas>
+
+    <script src="lib/three.min.js"></script>
+    <script src="lib/OrbitControls.js"></script>
+    <script src="lib/TransformControls.js"></script>
+    <script src="lib/UnpackDepthRGBAShader.js"></script>
+    <script src="lib/AnaglyphEffect.js"></script>
+    <script src="lib/ShadowMapViewer.js"></script>
+    <script src="lib/stats.min.js"></script>
+    <script src="mainview.js"></script>
+    <script src="uploader.js"></script>
+    <script>
+
+
+    var mainView = new MainView();
+
+    mainView.setTextureMap("test-images/testtex.jpg");
+    mainView.setDepthMap("test-images/testdepth.jpg");
+    mainView.start();
+
+    var texUploader = new Uploader("tex-map-preview", "tex-map-fileselect", mainView.setTextureMap);
+    var depthUploader = new Uploader("depth-map-preview", "depth-map-fileselect", mainView.setDepthMap);
+
+
+    $( "#invert-displacement" ).change(function() {
+        mainView.setInvertDisplacement($(this).prop('checked'));
+    });
+
+    $( "#render-anaglyph" ).change(function() {
+        mainView.setRenderAnaglyph($(this).prop('checked'));
+    });
+
+    $( function() {
+        $( "input[type='checkbox']" ).checkboxradio();
+    } );
+
+    function refreshLightIntensity() {
+        var intensity = $( "#light-intensity-slider" ).slider( "value" );
+        mainView.setLightIntensity(intensity / 100.0);
+    }
+
+    $( function() {
+        $( "#light-intensity-slider" ).slider({
+            range: "min",
+            max: 200,
+            value: 150,
+            slide: refreshLightIntensity,
+            change: refreshLightIntensity
+        });
+    } );
+
+    function refreshModelRoughness() {
+        var intensity = $( "#model-roughness-slider" ).slider( "value" );
+        mainView.setMaterialRoughness(intensity / 100.0);
+    }
+
+    $( function() {
+        $( "#model-roughness-slider" ).slider({
+            range: "min",
+            max: 100,
+            value: 90,
+            slide: refreshModelRoughness,
+            change: refreshModelRoughness
+        });
+    } );
+
+
+    function refreshModelMetalness() {
+        var intensity = $( "#model-metalness-slider" ).slider( "value" );
+        mainView.setMaterialMetalness(intensity / 100.0);
+    }
+
+    $( function() {
+        $( "#model-metalness-slider" ).slider({
+            range: "min",
+            max: 100,
+            value: 20,
+            slide: refreshModelMetalness,
+            change: refreshModelMetalness
+        });
+    } );
+
+
+
+    </script>
+
+    </body>
+</html>

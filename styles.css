@@ -1,0 +1,114 @@
+body {
+    background-color: #000000;
+    font-family: 'Roboto', sans-serif;
+    color: #c8c8c8;
+    font-weight: 300;
+    padding: 0px;
+    margin: 0px;
+}
+
+canvas {
+
+}
+
+.controls-overlay-box {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(50, 50, 50, .7);
+    padding: 10px;
+    border-radius: 5px;
+    width: 340px;
+    text-align: center;
+}
+
+.tex-image-box {
+    margin-top: 10px;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tex-box-header {
+    text-align: center;
+    font-size: .9em;
+    text-transform: uppercase;
+    margin: 4px;
+}
+
+.tex-image-preview-container {
+    height: 100px;
+    overflow: hidden;
+}
+
+.tex-image-preview {
+    width: 150px;
+}
+
+.tex-upload-container {
+
+}
+
+.tex-upload-label {
+    display: block;
+    font-size: .8em;
+    cursor: pointer;
+    border: 1px solid #909090;
+    margin: 4px auto 4px auto;
+    padding: 4px;
+    text-align: center;
+    width: 100px;
+}
+
+.tex-upload-input {
+    display:none;
+}
+
+
+.tex-upload-drop-target {
+    font-weight: bold;
+    text-align: center;
+    padding: 1em 0;
+    margin: 1em 0;
+    color: #555;
+    border: 2px dashed #555;
+    border-radius: 7px;
+    cursor: default;
+}
+
+.controls-box {
+    text-align: left;
+    margin: 10px;
+}
+
+.controls-box-title {
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.controls-input-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.controls-input-container input {
+
+}
+
+.controls-input-container label {
+
+}
+
+.controls-box-label {
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.instructions-box {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+    font-size: .9em;
+    background: rgba(50, 50, 50, .7);
+}
