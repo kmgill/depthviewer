@@ -104,6 +104,16 @@ function heightToColorAltimetry(canvas, invert, colorSpecName) {
         }
         var color = getColorForFraction(f, colorSpec);
 
+        /*
+        var hillShadeResolution = 4;
+        if ((i + hillShadeResolution*4) > width*4 && (i - hillShadeResolution*4) < width*4*height) {
+            var shadeF = computeHillshadeValueForPoint(src, width, i, hillShadeResolution);
+            color.r *= shadeF;
+            color.g *= shadeF;
+            color.b *= shadeF;
+        }
+        */
+
         dst.data[ i ] = color.r;
         dst.data[ i + 1 ] = color.g;
         dst.data[ i + 2 ] = color.b;
@@ -112,6 +122,57 @@ function heightToColorAltimetry(canvas, invert, colorSpecName) {
 
     context.putImageData( dst, 0, 0 );
 }
+
+
+var degToRad = function(v) {
+    return v * (Math.PI / 180);
+};
+
+var radToDeg = function(v) {
+    return v * (180 / Math.PI);
+};
+
+function computeHillshadeValueForPoint(src, width, i, res) {
+
+    scale = 100.0;
+    var altitude = 35;
+    var azimuth = 270;
+    var lightIntensity = 1.0;
+    var darkIntensity = 1.0;
+
+    var tl, l, bl, tr, r, br, t, b;
+
+    tl = src.data[(i - (width * 4)) - (4 * res)];
+    bl = src.data[(i + (width * 4)) - (4 * res)];
+    l = src.data[i - (4 * res)];
+    r = src.data[i + (4 * res)];
+    t = src.data[i - (width * (4 * res))];
+    b = src.data[i + (width * (4 * res))];
+    tr = src.data[(i - (width * 4)) + (4 * res)];
+    br = src.data[(i + (width * 4)) + (4 * res)];
+
+    var x = ((tl + l + bl) - (tr + r + br)) / (8.0 * scale);
+    var y = ((bl + b + br) - (tl + t, tr)) / (8.0 * scale);
+
+    var slope = (Math.PI / 2.0) - Math.atan(Math.atan(Math.sqrt(x * x + y * y)));
+    var aspect = Math.atan2(y, x);
+
+    var cang = Math.sin(degToRad(altitude)) * Math.sin(slope) +
+        Math.cos(degToRad(altitude)) * Math.cos(slope) *
+        Math.cos(degToRad(azimuth) - (Math.PI / 2.0) - aspect);
+
+    cang = (cang <= 0) ? 1.0 : (1.0 + (254.0 * cang));
+    var f = ((cang / 180.0) * 2) - 1.0;
+
+    if (f > 0) {
+        f *= lightIntensity;
+    } else if (f < 0) {
+        f *= darkIntensity;
+    }
+
+    return f;
+}
+
 
 
 /**

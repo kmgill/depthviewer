@@ -20,7 +20,7 @@ var MainView = function() {
     var useColorAltimetry = false;
     var colorSpecName = "rainbow";
     var diffuseTexture = null;
-
+    var shadows = false;
     var stats = new Stats();
 
     var container = document.createElement( 'div' );
@@ -40,28 +40,31 @@ var MainView = function() {
     camera.lookAt( new THREE.Vector3( 0, 0, 0 ) )
 
 
-    //var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
-    //directionalLight.position.set( 50, 100, 50 ).normalize();
-    //scene.add( directionalLight );
+    var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+    light.position.set( 50, 100, 50 ).normalize();
+    scene.add( light );
 
 
 
     //var ambientLight = new THREE.AmbientLight( 0x333333 );
     //scene.add( ambientLight );
+
+    /*
     light = new THREE.SpotLight( 0xffffff, 1.5, 0, Math.PI / 2 );
     light.position.set( 0,1500, 1000);
     light.target.position.set( 0, 0, 0 );
-    light.castShadow = false; // Turned off for now until I can get it working
+    light.castShadow = shadows; // Turned off for now until I can get it working
     light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera(50, 1, 1200, 2500 ) );
     light.shadow.bias = 0.0001;
     light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
     light.shadow.mapSize.height = SHADOW_MAP_HEIGHT;
     scene.add( light );
+    */
 
     createHUD();
 
     renderer.autoClear = false;
-    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.enabled = shadows;
     renderer.shadowMap.type = THREE.PCFShadowMap;
 
     var width = window.innerWidth || 2;
@@ -78,9 +81,9 @@ var MainView = function() {
         roughness: 0.9,
         metalness: 0.2,
         displacementScale: (displacementScale * displacementDirection),
-        displacementBias: displacementBias
+        displacementBias: displacementBias,
+        wireframe: false
     });
-
 
     var plane = new THREE.Mesh( geometry, material );
     plane.rotation.x = -70 * Math.PI / 180.0;
@@ -95,11 +98,7 @@ var MainView = function() {
     //controls.enableZoom = true;
     //controls.enableDamping = true;
 
-    var control = new THREE.TransformControls( camera, renderer.domElement );
-    control.addEventListener( 'change', render );
-    ///control.setSpace( "local" );
-    control.attach( plane );
-    scene.add( control );
+
 
     function createHUD() {
         lightShadowMapViewer = new THREE.ShadowMapViewer( light );
@@ -176,11 +175,17 @@ var MainView = function() {
         }
     };
 
+
+    var control = new THREE.TransformControls( camera, renderer.domElement );
+    control.addEventListener( 'change', render );
+    control.attach( plane );
+    scene.add( control );
+
     var animate = function() {
         requestAnimationFrame(animate);
         control.update();
-        //controls.update();
         stats.begin();
+        //light.updateMatrix();
         if (renderAnaglyph) {
             anaglyph.render( scene, camera );
         } else {
@@ -294,6 +299,10 @@ var MainView = function() {
         material.displacementScale = (displacementScale * displacementDirection);
     };
 
+    setWireframeMode = function(wf) {
+        material.wireframe = wf;
+    };
+
     return {
         start: start,
         setTextureMap: setTextureMap,
@@ -306,6 +315,7 @@ var MainView = function() {
         saveScreenshot : saveScreenshot,
         setDisplacementScale : setDisplacementScale,
         setUsingColorAltimetry : setUsingColorAltimetry,
-        setColorSpecName : setColorSpecName
+        setColorSpecName : setColorSpecName,
+        setWireframeMode : setWireframeMode
     };
 };

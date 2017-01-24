@@ -54,7 +54,10 @@
                 </select>
             </div>
 
-
+            <div class="controls-input-container">
+                <input type="checkbox" id="mesh-wireframe"/>
+                <label for="mesh-wireframe">Wireframe</label>
+            </div>
 
             <div class="controls-input-container">
                 <div class="controls-box-label">Light Intensity:</div>
@@ -123,6 +126,12 @@
         $( "#colorized-depth" ).change(function() {
             mainView.setUsingColorAltimetry($(this).prop('checked'));
         });
+
+        $( "#mesh-wireframe" ).change(function() {
+            mainView.setWireframeMode($(this).prop('checked'));
+        });
+
+
 
         $( function() {
             $( "input[type='checkbox']" ).checkboxradio();
