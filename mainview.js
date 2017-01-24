@@ -8,11 +8,11 @@ var MainView = function() {
     var HUD_MARGIN = 0.05;
 
     // Controllable options
-    this.displacementDirection = -1; // To invert, set to -1
-    this.displacementScale = 100;
-    this.displacementBias = 90;
+    var displacementDirection = -1; // To invert, set to -1
+    var displacementScale = 100;
+    var displacementBias = 90;
 
-    this.bumpScale = 10;
+    var bumpScale = 10;
     var showHUD = false;
     var renderAnaglyph
     var lightShadowMapViewer;
@@ -67,14 +67,14 @@ var MainView = function() {
 
     scene.add( new THREE.GridHelper( 1000, 10 ) );
 
-    var geometry = new THREE.PlaneGeometry( 400, 400, 256, 256 );
+    var geometry = new THREE.PlaneGeometry( 400, 400, 512, 512 );
 
 
     var material = new THREE.MeshStandardMaterial({
         roughness: 0.9,
         metalness: 0.2,
-        displacementScale: (this.displacementScale * this.displacementDirection),
-        displacementBias: this.displacementBias
+        displacementScale: (displacementScale * displacementDirection),
+        displacementBias: displacementBias
     });
 
 
@@ -211,7 +211,7 @@ var MainView = function() {
         );
 
         material.bumpMap = texture;
-        material.bumpScale = (scope.bumpScale * scope.displacementDirection);
+        material.bumpScale = (bumpScale * displacementDirection);
         material.displacementMap = texture;
         texture.needsUpdate = true;
 
@@ -219,11 +219,11 @@ var MainView = function() {
 
     var setInvertDisplacement = function(invert) {
         if (invert) {
-           scope.displacementDirection = -1;
+           displacementDirection = -1;
         } else {
-           scope.displacementDirection = 1;
+           displacementDirection = 1;
         }
-        material.displacementScale = (scope.displacementScale * scope.displacementDirection);
+        material.displacementScale = (displacementScale * displacementDirection);
 
     };
 
@@ -247,6 +247,11 @@ var MainView = function() {
         window.open( renderer.domElement.toDataURL("image/png"), "Final");
     };
 
+    setDisplacementScale = function(dc) {
+        displacementScale = dc;
+        material.displacementScale = (displacementScale * displacementDirection);
+    };
+
     return {
         start: start,
         setTextureMap: setTextureMap,
@@ -256,7 +261,8 @@ var MainView = function() {
         setMaterialRoughness: setMaterialRoughness,
         setMaterialMetalness : setMaterialMetalness,
         setRenderAnaglyph : setRenderAnaglyph,
-        saveScreenshot : saveScreenshot
+        saveScreenshot : saveScreenshot,
+        setDisplacementScale : setDisplacementScale
     };
 };
 

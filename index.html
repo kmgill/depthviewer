@@ -59,6 +59,11 @@
                 <div id="model-metalness-slider"></div>
             </div>
 
+            <div class="controls-input-container">
+                <div class="controls-box-label">Displacement Scale:</div>
+                <div id="model-displacement-slider"></div>
+            </div>
+
         </div>
 
     </div>
@@ -149,8 +154,20 @@
         });
     } );
 
+    function refreshModelDisplacement() {
+        var intensity = $( "#model-displacement-slider" ).slider( "value" );
+        mainView.setDisplacementScale(intensity);
+    }
 
-
+    $( function() {
+        $( "#model-displacement-slider" ).slider({
+            range: "min",
+            max: 300,
+            value: 100,
+            slide: refreshModelDisplacement,
+            change: refreshModelDisplacement
+        });
+    } );
     </script>
 
     </body>
