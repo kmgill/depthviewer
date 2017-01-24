@@ -17,6 +17,9 @@ var MainView = function() {
     var renderAnaglyph
     var lightShadowMapViewer;
 
+    var useColorAltimetry = false;
+    var diffuseTexture = null;
+
     var stats = new Stats();
 
     var container = document.createElement( 'div' );
@@ -191,6 +194,23 @@ var MainView = function() {
         animate();
     };
 
+    var applyColorAltimetryMap = function() {
+        var texture = material.bumpMap;
+
+        var scratchMap = document.getElementById( 'scratchCanvas' );
+
+        scratchMap.width = texture.image.width;
+        scratchMap.height = texture.image.height;
+        scratchMap.getContext( '2d' ).drawImage( texture.image, 0, 0 );
+
+        heightToColorAltimetry(scratchMap, displacementDirection == -1);
+
+        var colortMapTex = new THREE.Texture( scratchMap );
+        colortMapTex.needsUpdate = true;
+        material.map = colortMapTex;
+
+    };
+
     var setTextureMap = function(tex) {
         var texture = new THREE.TextureLoader().load( tex,
             function ( texture ) {
@@ -201,12 +221,15 @@ var MainView = function() {
             }
         );
         material.map = texture;
+        diffuseTexture = texture;
     };
 
     var setDepthMap = function(tex) {
         var texture = new THREE.TextureLoader().load( tex,
             function ( texture ) {
-
+                if (useColorAltimetry) {
+                    applyColorAltimetryMap();
+                }
             }
         );
 
@@ -217,6 +240,15 @@ var MainView = function() {
 
     };
 
+    setUsingColorAltimetry = function(useColorAlt) {
+        useColorAltimetry = useColorAlt;
+        if (useColorAltimetry) {
+            applyColorAltimetryMap();
+        } else {
+            material.map = diffuseTexture;
+        }
+    };
+
     var setInvertDisplacement = function(invert) {
         if (invert) {
            displacementDirection = -1;
@@ -224,7 +256,9 @@ var MainView = function() {
            displacementDirection = 1;
         }
         material.displacementScale = (displacementScale * displacementDirection);
-
+        if (useColorAltimetry) {
+            applyColorAltimetryMap();
+        }
     };
 
     setLightIntensity = function(intensity) {
@@ -262,6 +296,7 @@ var MainView = function() {
         setMaterialMetalness : setMaterialMetalness,
         setRenderAnaglyph : setRenderAnaglyph,
         saveScreenshot : saveScreenshot,
-        setDisplacementScale : setDisplacementScale
+        setDisplacementScale : setDisplacementScale,
+        setUsingColorAltimetry : setUsingColorAltimetry
     };
 };
