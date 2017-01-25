@@ -12,6 +12,14 @@
     </head>
     <body>
 
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-title-box">
+            <div class="loading-title">Depth Viewer</div>
+            <div class="loading-spinner"><i class='fa fa-spinner fa-spin'></i></div>
+            <div class="loading-text">Loading...</div>
+        </div>
+
+    </div>
 
     <div class="controls-overlay-box">
         <div class="tex-image-box">
@@ -99,11 +107,29 @@
     <script src="imageutils.js"></script>
     <script src="mainview.js"></script>
     <script src="uploader.js"></script>
+    <script src="navcontroller.js"></script>
     <script>
 
 
     $( function() {
+        var config = {
+            "textureMap" : "",
+            "depthMath" : "",
+            "invertDisplacement" : AppEnv.getUrlVar("invertDisplacement", true),
+            "renderAnaglyph" : AppEnv.getUrlVar("renderAnaglyph", false),
+            "colorizedDepth" : AppEnv.getUrlVar("colorizedDepth", false),
+            "wireframeMode" : AppEnv.getUrlVar("wireframeMode", false),
+            "lightIntensity" : AppEnv.getUrlVar("lightIntensity", 150),
+            "modelRoughness" : AppEnv.getUrlVar("modelRoughness", 90),
+            "modelMetalness" : AppEnv.getUrlVar("modelMetalness", 20),
+            "modelDisplacement" : AppEnv.getUrlVar("modelDisplacement", 100),
+            "colorSpec" : AppEnv.getUrlVar("colorSpec", "rainbow")
+        }
 
+
+        var navController = new NavigationController(config);
+        console.info(config);
+        navController.pushState();
 
         var mainView = new MainView();
 
@@ -117,36 +143,46 @@
 
         $( "#invert-displacement" ).change(function() {
             mainView.setInvertDisplacement($(this).prop('checked'));
+            config["invertDisplacement"] = $(this).prop('checked');
+            navController.pushState();
         });
 
         $( "#render-anaglyph" ).change(function() {
             mainView.setRenderAnaglyph($(this).prop('checked'));
+            config["renderAnaglyph"] = $(this).prop('checked');
+            navController.pushState();
         });
 
         $( "#colorized-depth" ).change(function() {
             mainView.setUsingColorAltimetry($(this).prop('checked'));
+            config["colorizedDepth"] = $(this).prop('checked');
+            navController.pushState();
         });
+
 
         $( "#mesh-wireframe" ).change(function() {
             mainView.setWireframeMode($(this).prop('checked'));
+            config["wireframeMode"] = $(this).prop('checked');
+            navController.pushState();
         });
+        $( "#mesh-wireframe").prop("checked", config["wireframeMode"]);
 
-
-
-        $( function() {
-            $( "input[type='checkbox']" ).checkboxradio();
-        } );
+        //$( function() {
+        //    $( "input[type='checkbox']" ).checkboxradio();
+        //} );
 
         function refreshLightIntensity() {
             var intensity = $( "#light-intensity-slider" ).slider( "value" );
             mainView.setLightIntensity(intensity / 100.0);
+            config["lightIntensity"] = intensity;
+            navController.pushState();
         }
 
         $( function() {
             $( "#light-intensity-slider" ).slider({
                 range: "min",
                 max: 200,
-                value: 150,
+                value: config["lightIntensity"],
                 slide: refreshLightIntensity,
                 change: refreshLightIntensity
             });
@@ -155,13 +191,15 @@
         function refreshModelRoughness() {
             var intensity = $( "#model-roughness-slider" ).slider( "value" );
             mainView.setMaterialRoughness(intensity / 100.0);
+            config["modelRoughness"] = intensity;
+            navController.pushState();
         }
 
         $( function() {
             $( "#model-roughness-slider" ).slider({
                 range: "min",
                 max: 100,
-                value: 90,
+                value: config["modelRoughness"],
                 slide: refreshModelRoughness,
                 change: refreshModelRoughness
             });
@@ -171,13 +209,15 @@
         function refreshModelMetalness() {
             var intensity = $( "#model-metalness-slider" ).slider( "value" );
             mainView.setMaterialMetalness(intensity / 100.0);
+            config["modelMetalness"] = intensity;
+            navController.pushState();
         }
 
         $( function() {
             $( "#model-metalness-slider" ).slider({
                 range: "min",
                 max: 100,
-                value: 20,
+                value: config["modelMetalness"],
                 slide: refreshModelMetalness,
                 change: refreshModelMetalness
             });
@@ -186,24 +226,57 @@
         function refreshModelDisplacement() {
             var intensity = $( "#model-displacement-slider" ).slider( "value" );
             mainView.setDisplacementScale(intensity);
+            config["modelDisplacement"] = intensity;
+            navController.pushState();
         }
 
         $( function() {
             $( "#model-displacement-slider" ).slider({
                 range: "min",
                 max: 300,
-                value: 100,
+                value: config["modelDisplacement"],
                 slide: refreshModelDisplacement,
                 change: refreshModelDisplacement
             });
         } );
 
+
         $( "#color-spec" ).selectmenu({
             change: function( event, data ) {
                 mainView.setColorSpecName(data.item.value);
+                config["colorSpec"] = data.item.value;
+                navController.pushState();
             },
             width: 130
         });
+
+
+        function applyConfig(config) {
+            $( "#color-spec" ).val(config["colorSpec"]);
+            mainView.setColorSpecName(config["colorSpec"]);
+
+            $( "#colorized-depth").prop("checked", config["colorizedDepth"]);
+            mainView.setUsingColorAltimetry(config["colorizedDepth"]);
+
+            $( "#invert-displacement").prop("checked", config["invertDisplacement"]);
+            mainView.setInvertDisplacement(config["invertDisplacement"]);
+
+            $( "#render-anaglyph").prop("checked", config["renderAnaglyph"]);
+            mainView.setRenderAnaglyph(config["renderAnaglyph"]);
+
+            $( "#mesh-wireframe").prop("checked", config["wireframeMode"]);
+            mainView.setWireframeMode(config["wireframeMode"]);
+
+            mainView.setLightIntensity(config["lightIntensity"] / 100.0);
+            mainView.setMaterialRoughness(config["modelRoughness"] / 100.0);
+            mainView.setMaterialMetalness(config["modelMetalness"] / 100.0);
+            mainView.setDisplacementScale(config["modelDisplacement"]);
+        }
+
+        setTimeout(function() {
+            applyConfig(config);
+            $('#loading-overlay').css('display','none');
+        }, 1000);
 
     });
     </script>
