@@ -113,8 +113,8 @@
 
     $( function() {
         var config = {
-            "textureMap" : "",
-            "depthMath" : "",
+            "textureMap" : "test-images/testtex.jpg",//AppEnv.getUrlVar("textureMap", "test-images/testtex.jpg"),
+            "depthMap" : "test-images/testdepth.jpg",//AppEnv.getUrlVar("depthMap", "test-images/testdepth.jpg"),
             "invertDisplacement" : AppEnv.getUrlVar("invertDisplacement", true),
             "renderAnaglyph" : AppEnv.getUrlVar("renderAnaglyph", false),
             "colorizedDepth" : AppEnv.getUrlVar("colorizedDepth", false),
@@ -126,6 +126,8 @@
             "colorSpec" : AppEnv.getUrlVar("colorSpec", "rainbow")
         }
 
+        //config["textureMap"] = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01408/mhli/1408MH0001630000502846R00_DXXX.jpg";
+        //config["depthMap"] = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01408/mhli/1408MH0001630000502847S00_DXXX.jpg";
 
         var navController = new NavigationController(config);
         console.info(config);
@@ -133,13 +135,13 @@
 
         var mainView = new MainView();
 
-        mainView.setTextureMap("test-images/testtex.jpg");
-        mainView.setDepthMap("test-images/testdepth.jpg");
-        mainView.start();
-
         var texUploader = new Uploader("tex-map-preview", "tex-map-fileselect", mainView.setTextureMap);
         var depthUploader = new Uploader("depth-map-preview", "depth-map-fileselect", mainView.setDepthMap);
 
+        texUploader.setImageViaUrl(config["textureMap"]);
+        depthUploader.setImageViaUrl(config["depthMap"]);
+
+        mainView.start();
 
         $( "#invert-displacement" ).change(function() {
             mainView.setInvertDisplacement($(this).prop('checked'));
