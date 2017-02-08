@@ -26,6 +26,20 @@ ColorSpecs["divergent"] = [
     {f: 1.0, r: 253, g: 0, b: 0}
 ];
 
+function expandDepthMapValues(tex) {
+    var scratchMap = document.getElementById( 'scratchCanvas' );
+
+    scratchMap.width = tex.image.width;
+    scratchMap.height = tex.image.height;
+    scratchMap.getContext( '2d' ).drawImage( tex.image, 0, 0 );
+
+    heightToColorAltimetry(scratchMap, false, "monochrome");
+
+    var colortMapTex = new THREE.Texture( scratchMap );
+    colortMapTex.needsUpdate = true;
+    return colortMapTex;
+}
+
 function getLowerColorStopForFraction(f, colorSpec) {
     var lastStop = colorSpec[0];
     for (var i = 0; i < colorSpec.length; i++) {
@@ -45,7 +59,7 @@ function getUpperColorStopForFraction(f, colorSpec) {
             return stop;
         }
     }
-    return ColorAltimetrySpec[ColorAltimetrySpec.length - 1]; // Might not need this, or in another form
+    return colorSpec[colorSpec.length - 1]; // Might not need this, or in another form
 }
 
 
@@ -85,8 +99,6 @@ function heightToColorAltimetry(canvas, invert, colorSpecName) {
 
     var min = minMax.min;
     var max = minMax.max;
-
-
     var context = canvas.getContext( '2d' );
 
     var width = canvas.width;

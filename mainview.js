@@ -9,9 +9,10 @@ var MainView = function() {
 
     // Controllable options
     var displacementDirection = -1; // To invert, set to -1
-    var displacementScale = 100;
+    var displacementScale = 60;
     var displacementBias = 90;
 
+    var originalDisplacementTexture = null;
     var bumpScale = 10;
     var showHUD = false;
     var renderAnaglyph
@@ -163,6 +164,7 @@ var MainView = function() {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
 
+        anaglyph.setSize( width, height );
         renderer.setSize( width, height );
     };
     window.addEventListener( 'resize', onWindowResize, false );
@@ -179,6 +181,7 @@ var MainView = function() {
     var control = new THREE.TransformControls( camera, renderer.domElement );
     control.addEventListener( 'change', render );
     control.attach( plane );
+    //control.setSize( control.size * 0.4 );
     scene.add( control );
 
     var animate = function() {
@@ -197,6 +200,7 @@ var MainView = function() {
     };
 
     var start = function() {
+        control.setSize( control.size * 0.4 );
         animate();
     };
 
@@ -208,7 +212,11 @@ var MainView = function() {
     };
 
     var applyColorAltimetryMap = function() {
-        var texture = material.bumpMap;
+        if (originalDisplacementTexture == null) {
+            return;
+
+        }
+        var texture = originalDisplacementTexture;
 
         var scratchMap = document.getElementById( 'scratchCanvas' );
 
@@ -237,19 +245,34 @@ var MainView = function() {
         diffuseTexture = texture;
     };
 
-    var setDepthMap = function(tex) {
-        var texture = new THREE.TextureLoader().load( tex,
-            function ( texture ) {
-                if (useColorAltimetry) {
-                    applyColorAltimetryMap();
-                }
-            }
-        );
-
+    var __setDepthMapWithTexture = function(texture) {
         material.bumpMap = texture;
         material.bumpScale = (bumpScale * displacementDirection);
         material.displacementMap = texture;
         texture.needsUpdate = true;
+        if (useColorAltimetry) {
+            applyColorAltimetryMap();
+        }
+    };
+
+    var setDepthMap = function(tex, expand) {
+        expand = true;
+        var texture = new THREE.TextureLoader().load( tex,
+            function ( texture ) {
+
+                if (expand) {
+                    var t = expandDepthMapValues(texture);
+                    __setDepthMapWithTexture(t);
+                } else {
+
+                }
+
+
+            }
+        );
+        originalDisplacementTexture = texture;
+        __setDepthMapWithTexture(texture);
+
 
     };
 
