@@ -113,8 +113,9 @@
 
     $( function() {
         var config = {
-            "textureMap" : "test-images/testtex.jpg",//AppEnv.getUrlVar("textureMap", "test-images/testtex.jpg"),
-            "depthMap" : "test-images/testdepth.jpg",//AppEnv.getUrlVar("depthMap", "test-images/testdepth.jpg"),
+            "test": "true",
+            "textureMap" : AppEnv.getUrlVar("textureMap", "test-images/testtex.jpg"),
+            "depthMap" : AppEnv.getUrlVar("depthMap", "test-images/testdepth.jpg"),
             "invertDisplacement" : AppEnv.getUrlVar("invertDisplacement", true),
             "renderAnaglyph" : AppEnv.getUrlVar("renderAnaglyph", false),
             "colorizedDepth" : AppEnv.getUrlVar("colorizedDepth", false),
@@ -125,6 +126,8 @@
             "modelDisplacement" : AppEnv.getUrlVar("modelDisplacement", 60),
             "colorSpec" : AppEnv.getUrlVar("colorSpec", "rainbow")
         }
+
+        console.info(config);
 
         //config["textureMap"] = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01408/mhli/1408MH0001630000502846R00_DXXX.jpg";
         //config["depthMap"] = "http://mars.jpl.nasa.gov/msl-raw-images/msss/01408/mhli/1408MH0001630000502847S00_DXXX.jpg";
